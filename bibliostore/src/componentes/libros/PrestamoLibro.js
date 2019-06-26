@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
-import { Link } from 'react-router-dom';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { firestoreConnect } from 'react-redux-firebase';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Spinner from '../layout/Spinner';
 
 import FichaSuscriptor from '../suscriptores/FichaSuscriptor';
 
 // REDUX Actions
-import { buscarUsuario } from '../../actions/buscarUsuarioActions';
+import { buscarUsuario } from '../../actions/buscarUsuarioActions';
 
 class PrestamoLibro extends Component {
-    state = { 
+    state = {
         noResultados: false,
-        busqueda : ''
+        busqueda: ''
     }
 
     // Buscar alumno por Código
@@ -25,7 +25,7 @@ class PrestamoLibro extends Component {
         const { busqueda } = this.state;
 
         // extraer firestore
-        const { firestore, buscarUsuario } = this.props;
+        const { firestore, buscarUsuario } = this.props;
 
         // hacer la consulta
         const coleccion = firestore.collection('suscriptores');
@@ -33,7 +33,7 @@ class PrestamoLibro extends Component {
 
         // leer los resultados
         consulta.then(resultado => {
-            if(resultado.empty) {
+            if (resultado.empty) {
                 // no hay resultados
 
                 // almacenar en redux un objeto vacio
@@ -70,7 +70,7 @@ class PrestamoLibro extends Component {
         prestados = [...this.props.libro.prestados, usuario];
 
         // Copiar el objeto y agregar los prestados
-        const libro = {...this.props.libro};
+        const libro = { ...this.props.libro };
 
         // eliminar los prestados anteriores
         delete libro.prestados;
@@ -79,60 +79,60 @@ class PrestamoLibro extends Component {
         libro.prestados = prestados;
 
         // extraer firestore
-        const {firestore, history} = this.props;
+        const { firestore, history } = this.props;
 
         // almacenar en la BD
         firestore.update({
             collection: 'libros',
             doc: libro.id
-        }, libro ).then(history.push('/'));
+        }, libro).then(history.push('/'));
     }
 
 
     // Almacenar el codigo en el state
     leerDato = e => {
         this.setState({
-            [e.target.name] : e.target.value
+            [e.target.name]: e.target.value
         })
     }
 
 
-    render() { 
+    render() {
         // Extaer el libro
         const { libro } = this.props;
-    
+
         // mostrar el spinner
-        if(!libro) return <Spinner />
+        if (!libro) return <Spinner />
 
         // extraer los datos del alumno
-        const {  usuario } = this.props;
+        const { usuario } = this.props;
 
         let fichaAlumno, btnSolicitar;
-        if(usuario.nombre) {
-            fichaAlumno = <FichaSuscriptor 
-                            alumno={usuario}
-                         />
+        if (usuario.nombre) {
+            fichaAlumno = <FichaSuscriptor
+                alumno={usuario}
+            />
             btnSolicitar = <button
-                                type="button"
-                                className="btn btn-primary btn-block"
-                                onClick={this.solicitarPrestamo}
-                                >Solicitar Prestamo</button>
+                type="button"
+                className="btn btn-primary btn-block"
+                onClick={this.solicitarPrestamo}
+            >Solicitar Prestamo</button>
         } else {
             fichaAlumno = null;
             btnSolicitar = null;
         }
 
         // Mostrar mensaje de error
-        const {noResultados} = this.state;
+        const { noResultados } = this.state;
 
         let mensajeResultado = '';
-        if(noResultados) {
+        if (noResultados) {
             mensajeResultado = <div className="alert alert-danger text-center font-weight-bold">No hay resultados para ese código.</div>
         } else {
             mensajeResultado = null;
         }
 
-        return ( 
+        return (
             <div className="row">
                 <div className="col-12 mb-4">
                     <Link to={'/'} className="btn btn-secondary">
@@ -153,7 +153,7 @@ class PrestamoLibro extends Component {
                                 className="mb-4"
                             >
                                 <legend className="color-primary text-center">
-                                    Busca el Suscriptor por Código
+                                    Escribe tu código de suscirptor
                                 </legend>
 
                                 <div className="form-group">
@@ -164,7 +164,7 @@ class PrestamoLibro extends Component {
                                         onChange={this.leerDato}
                                     />
                                 </div>
-                                <input value="Buscar Alumno" type="submit" className="btn btn-success btn-block"/>
+                                <input value="Buscar Alumno" type="submit" className="btn btn-success btn-block" />
                             </form>
 
                             {/* Muestra la ficha del alumno y el botón para solicitar el prestamo */}
@@ -172,31 +172,31 @@ class PrestamoLibro extends Component {
                             {btnSolicitar}
 
                             {/* Muestra un mensaje de no resultados */}
-                            
+
                             {mensajeResultado}
 
                         </div>
                     </div>
                 </div>
             </div>
-         );
+        );
     }
 }
- 
+
 PrestamoLibro.propTypes = {
     firestore: PropTypes.object.isRequired
 }
- 
+
 export default compose(
     firestoreConnect(props => [
         {
-            collection : 'libros',
-            storeAs : 'libro',
-            doc : props.match.params.id
+            collection: 'libros',
+            storeAs: 'libro',
+            doc: props.match.params.id
         }
-    ]), 
-    connect(({ firestore: { ordered }, usuario}, props ) => ({
-        libro : ordered.libro && ordered.libro[0],
+    ]),
+    connect(({ firestore: { ordered }, usuario }, props) => ({
+        libro: ordered.libro && ordered.libro[0],
         usuario: usuario
-    }), {  buscarUsuario })
+    }), { buscarUsuario })
 )(PrestamoLibro)

@@ -1,25 +1,25 @@
 import React from 'react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
-import { Link } from 'react-router-dom';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { firestoreConnect } from 'react-redux-firebase';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Spinner from '../layout/Spinner';
 
-const Suscriptores = ({suscriptores, firestore}) => {
+const Suscriptores = ({ suscriptores, firestore }) => {
 
-    if(!suscriptores) return <Spinner />;
+    if (!suscriptores) return <Spinner />;
 
     // Eliminar Suscriptores
     const eliminarSuscriptor = id => {
         // eliminar
         firestore.delete({
-            collection : 'suscriptores', 
-            doc : id
+            collection: 'suscriptores',
+            doc: id
         });
     }
 
-    return ( 
+    return (
         <div className="row">
             <div className="col-md-12 mb-4">
                 <Link
@@ -57,13 +57,13 @@ const Suscriptores = ({suscriptores, firestore}) => {
                                 >
                                     <i className="fas fa-angle-double-right"></i> {''}
                                     Más Información
-                                
+
                                 </Link>
 
                                 <button
                                     type="button"
                                     className="btn btn-danger btn-block"
-                                    onClick={ () => eliminarSuscriptor(suscriptor.id) }
+                                    onClick={() => eliminarSuscriptor(suscriptor.id)}
                                 >
                                     <i className="fas fa-trash-alt"></i> {''}
                                     Eliminar
@@ -76,17 +76,18 @@ const Suscriptores = ({suscriptores, firestore}) => {
                 </tbody>
             </table>
         </div>
-     );
-}
-Suscriptores.propTypes = {
-    firestore : PropTypes.object.isRequired,
-    suscriptores : PropTypes.array
+    );
 }
 
- 
+Suscriptores.propTypes = {
+    firestore: PropTypes.object.isRequired,
+    suscriptores: PropTypes.array
+}
+
+
 export default compose(
-    firestoreConnect([{ collection : 'suscriptores' }]),
+    firestoreConnect([{ collection: 'suscriptores' }]),
     connect((state, props) => ({
-        suscriptores : state.firestore.ordered.suscriptores
+        suscriptores: state.firestore.ordered.suscriptores
     }))
 )(Suscriptores);
